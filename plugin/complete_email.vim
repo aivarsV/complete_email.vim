@@ -73,7 +73,7 @@ fun! complete_email#complete() abort
 
 		call add(l:res, {
 			\ 'icase': 1,
-			\ 'word': l:m[0] . ' <' . l:m[1] . '>, ',
+			\ 'word': l:m[1] . ' <' . l:m[0] . '>',
 			\ 'abbr': l:m[0],
 			\ 'menu': l:m[1],
 			\ 'info': len(l:m) > 2 ? join(l:m[2:], "\n") : '',
