@@ -47,7 +47,11 @@ command! AddEmailAddress :call s:add_address()
 
 " Read database file
 fun! complete_email#read_db() abort
-	return map(readfile(g:complete_email_file), 'split(v:val, "")')
+  if exists('g:complete_email_gpg_key') && !empty('g:complete_email_gpg_key')
+    return map(systemlist('gpg --decrypt ' . g:complete_email_file . ' 2>/dev/null'), 'split(v:val, "")')
+  else
+    return map(readfile(g:complete_email_file), 'split(v:val, "")')
+  endif
 endfun
 
 
@@ -119,8 +123,21 @@ endfun
 
 
 fun! complete_email#add_address(email, name, other) abort
-	call writefile([a:email . '' . a:name], g:complete_email_file, 'a')
-	let g:complete_email_addresses = complete_email#read_db()
+  if exists('g:complete_email_gpg_key') && !empty('g:complete_email_gpg_key')
+    " Make sure loaded database matches that stored in file
+    let l:addresses = map(complete_email#read_db(), 'join(v:val, "")')
+    call add(l:addresses, a:email . '' . a:name)
+    call add(l:addresses, '')
+    call system('gpg --encrypt --armor --sign -r ' . g:complete_email_gpg_key . ' --output ' . g:complete_email_file,
+        \ l:addresses)
+    " You will be prompted before overwriting current file, and possibly for
+    " passphrase
+    redraw!
+
+  else
+    call writefile([a:email . '' . a:name], g:complete_email_file, 'a')
+  endif
+  let g:complete_email_addresses = complete_email#read_db()
 endfun
 
 

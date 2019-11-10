@@ -93,5 +93,9 @@ OPTIONS                                               *complete-email-options*
 <
         Note that |:AddEmailAddress| will no longer work if you do this.
 
+*g:complete_email_gpg_key*                        (String, default: undefined)
+       Gpg key identifier. Can be name, email or any other keyID. Set this
+       variable to enable database file encryption.
+
 
 vim:tw=78:ts=8:ft=help:norl:expandtab
